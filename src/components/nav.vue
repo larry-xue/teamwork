@@ -4,15 +4,15 @@
       <div class="logo">
         <el-dropdown @command="handleCommand">
           <span class="el-dropdown-link">
-            Azoux的团队<i class="el-icon-arrow-down el-icon--right"></i>
+            {{nowTeam}}<i class="el-icon-arrow-down el-icon--right"></i>
           </span>
           <el-dropdown-menu slot="dropdown">
             <el-dropdown-item disabled>切换团队</el-dropdown-item>
              <el-dropdown-item
-              v-for="(team, index) in teamList"
-              :key=index
+              v-for="team in teamList"
+              :key="team.id"
              >
-               {{ team }}
+               {{ team.name }}
              </el-dropdown-item>
              <el-divider></el-divider>
             <el-dropdown-item
@@ -24,10 +24,10 @@
         </el-dropdown>
       </div>
       <ul class="nav-menu">
-        <li @click="switchPage('/team/work')">办公</li>
+        <li @click="switchPage('/team/library')">文库</li>
         <li @click="switchPage('/team/calendar')">日历</li>
         <li @click="switchPage('/team/member')">团队</li>
-        <li @click="switchPage('/team/trend')">动态</li>
+        <li @click="switchPage('/team/affair')">办公</li>
         <li @click="switchPage('/team/myself')">自己</li>
       </ul>
     </nav>
@@ -41,14 +41,12 @@ export default {
   computed: {
     ...mapState({
       createTeam: (state) => state.createTeam,
+      teamList: (state) => state.teamList,
+      nowTeam: (state) => state.nowTeam,
     }),
   },
   data() {
     return {
-      teamList: [
-        'azoux',
-        'asd',
-      ],
     };
   },
   methods: {

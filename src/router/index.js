@@ -46,12 +46,17 @@ const routes = [
             name: 'settings',
             component: () => import('../views/team/myself/team_myself_settings.vue'),
           },
+          {
+            path: '/team/myself/todos',
+            name: 'todo',
+            component: () => import('../views/team/myself/team_myself_todos.vue'),
+          },
         ],
       },
       {
-        path: '/team/work',
-        name: 'work',
-        component: () => import('../views/team/work/team_work.vue'),
+        path: '/team/library',
+        name: 'library',
+        component: () => import('../views/team/library/team_library.vue'),
       },
       {
         path: '/team/calendar',
@@ -63,18 +68,36 @@ const routes = [
         name: 'member',
         component: () => import('../views/team/member/team_member.vue'),
       },
+      {
+        path: '/team/affair',
+        name: 'affair',
+        component: () => import('../views/team/affair/team_affair.vue'),
+      },
     ],
   },
+
   {
-    path: '/document/word',
-    name: 'word',
-    component: () => import('../views/doc/doc_word.vue'),
+    path: '/document',
+    name: 'document',
+    component: () => import('../views/doc/doc.vue'),
+    children: [
+      {
+        path: '/document/markdown',
+        name: 'markdown',
+        component: () => import('../components/markdown.vue'),
+      },
+      {
+        path: '/document/word',
+        name: 'word',
+        component: () => import('../components/word.vue'),
+      },
+    ],
   },
 ];
 
 const router = new VueRouter({
   routes,
-  mode: 'history',
+  mode: 'hash',
 });
 
 export default router;

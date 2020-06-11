@@ -16,6 +16,7 @@
       <input
         type="file"
         ref="inputPic"
+        name="avatar"
         @change="updatePic"
         accept="image/png,image/gif,image/jpeg"
       >

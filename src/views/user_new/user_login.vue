@@ -60,6 +60,7 @@
 import { mapState } from 'vuex';
 import md5 from 'js-md5';
 import Storage from '../../storage/storage';
+import init from '../../init/init';
 
 export default {
   mounted() {
@@ -119,7 +120,7 @@ export default {
       this.$refs[formName].validate((valid) => {
         let val = true;
         if (valid) {
-          this.$http.get('https://www.fastmock.site/mock/df920649f50c9cd2392aa7389a2504d3/teamwork/user/login', {
+          this.$http.get('/v1/users/token', {
             auth: {
               username: this.ruleForm.username,
               password: md5(this.ruleForm.password),
@@ -136,6 +137,8 @@ export default {
               // 存token
               Storage.localSet('token', res.data.data.access_token);
               Storage.localSet('username', this.ruleForm.username);
+              // init
+              init();
               if (this.loginNextTime) {
                 Storage.localSet('refresh_token', res.data.data.refresh_token);
               }

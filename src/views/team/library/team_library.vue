@@ -70,7 +70,11 @@
               <i class="el-icon-plus"></i>
             </el-button>
               <el-dropdown-menu slot="dropdown">
-                 <el-dropdown-item>1</el-dropdown-item>
+                 <el-dropdown-item>
+                   <el-link href="/document/markdown" type="primary">创建markdown文档</el-link>
+                   <el-divider></el-divider>
+                   <el-link href="/document/word" type="primary">创建普通文档</el-link>
+                 </el-dropdown-item>
               </el-dropdown-menu>
         </el-dropdown>
         <el-upload

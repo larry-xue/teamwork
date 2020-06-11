@@ -149,71 +149,26 @@ export default {
     };
   },
   methods: {
-    exceedFile() {
-      console.log('file');
-    },
-    changeUserInfo(url) {
-      if (url) {
-        this.$http.patch('/v1/users', {
-          avatar: url,
-        }).then((res) => {
-          // 更新用户信息
-          if (res.data.code === 0) {
-            this.$store.commit('updateUserInfo', res.data.data);
-          }
-        }).catch(() => {
-          this.$message({
-            type: 'warning',
-            message: '头像更新失败',
-          });
-        });
-      }
-      if (this.upDateUser.name.trim() !== '') {
-        console.log('in');
-        this.$http.patch('/v1/users', {
-          name: this.upDateUser.name,
-        }).then((res) => {
-          // 更新用户信息
-          if (res.data.code === 0) {
-            this.$store.commit('updateUserInfo', res.data.data);
-          }
-        }).catch(() => {
-          this.$message({
-            type: 'warning',
-            message: '姓名更新失败',
-          });
-        });
-      }
-      if (this.upDateUser.email.trim() !== '') {
-        this.$http.patch('/v1/users', {
-          email: this.upDateUser.email + this.upDateUser.emailSelect,
-        }).then((res) => {
-          // 更新用户信息
-          if (res.data.code === 0) {
-            this.$store.commit('updateUserInfo', res.data.data);
-          }
-        }).catch(() => {
-          this.$message({
-            type: 'warning',
-            message: '邮箱更新失败',
-          });
-        });
-      }
-    },
     onSubmit() {
       const param = new FormData();
-      const file = this.$children[0].$children[0].$el.childNodes[1].childNodes[1].files[0];
+      const file = this.$children[0].$children[0].$el.children[1].children[1].files[0];
+      console.log(file);
       if (file !== undefined) {
-        // 上传图片
-        param.append('folder', 'icon');
-        param.append('file', file, file.name);
-        this.$http.put('/v1/users/avatar', param).then((res) => {
+      // 上传图片
+        param.append('file', file);
+        this.$http.put('/v1/users/avatar', param, {
+          headers: {
+            'Content-Type': 'multipart/form-data',
+          },
+        }).then((res) => {
+          console.log(res);
           if (res.data.code === 0) {
-            // 更新信息
+          // 更新信息
             this.changeUserInfo(res.data.data.avatar);
           }
-        }).catch(() => {
-          // 头像上传失败
+        }).catch((err) => {
+        // 头像上传失败
+          console.log(err);
         });
       } else {
         this.changeUserInfo(false);
@@ -221,7 +176,7 @@ export default {
     },
     // eslint-disable-next-line consistent-return
     onSubmitPassword(formName) {
-      // eslint-disable-next-line consistent-return
+    // eslint-disable-next-line consistent-return
       this.$refs[formName].validate((valid) => {
         if (valid) {
           this.$message({
@@ -232,6 +187,7 @@ export default {
             password: md5(this.passwordForm.oldPassword),
             password2: md5(this.passwordForm.newPassword),
           }).then((res) => {
+            console.log(res);
             if (res.data.code === 0) {
               this.$message({
                 type: 'success',
@@ -258,10 +214,12 @@ export default {
         });
         return false;
       }
-      this.$http.post(`/v1/teams/${this.userInfo.id}`, {
-        uid: this.inv_man_id,
+      this.$http.post(`/v1/teams/${this.teamInfo.id}`, {
+        uid: this.userInfo.id,
         action: 2,
       }).then((res) => {
+        console.log('/v1/teams');
+        console.log(res);
         if (res.data.code === 0) {
           this.$message({
             type: 'info',
@@ -274,6 +232,36 @@ export default {
           message: '退出失败',
         });
       });
+    },
+    exceedFile() {
+      console.log('file');
+    },
+    changeUserInfo(url) {
+      const sendInfo = {};
+      if (url) {
+        sendInfo.url = url;
+      }
+      if (this.upDateUser.name.trim() !== '') {
+        sendInfo.name = this.upDateUser.name.trim();
+      }
+      if (this.upDateUser.email.trim() !== '') {
+        sendInfo.email = this.upDateUser.email + this.upDateUser.emailSelect;
+      }
+      console.log(sendInfo);
+      if (sendInfo !== {}) {
+        this.$http.patch('/v1/users', sendInfo).then((res) => {
+          // 更新用户信息
+          console.log(res);
+          if (res.data.code === 0) {
+            this.$store.commit('updateUserInfo', res.data.data);
+          }
+        }).catch(() => {
+          this.$message({
+            type: 'warning',
+            message: '请检查邮箱格式是否正确失败',
+          });
+        });
+      }
     },
   },
 };

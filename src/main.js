@@ -13,17 +13,18 @@ Vue.config.productionTip = true;
 Vue.use(ElementUI);
 
 Vue.prototype.$http = axios;
-axios.defaults.baseURL = 'https://www.fastmock.site/mock/df920649f50c9cd2392aa7389a2504d3/teamwork';
+axios.defaults.baseURL = 'http://47.107.32.138';
 axios.defaults.headers.post['Content-Type'] = 'application/json';
 axios.defaults.headers.get['Content-Type'] = 'form-data';
+axios.defaults.headers.common['Content-Type'] = 'multipart/form-data';
 axios.defaults.withCredentials = true;
 
 // 请求拦截器
 axios.interceptors.request.use((config) => {
   let token = Storage.localGet('token');
   const axiosConfig = config;
-  if (token && config.headers.Authorization === '') {
-    token = `${'bearer '}${token}`;
+  if (token) {
+    token = `${'Bearer '}${token}`;
     axiosConfig.headers.Authorization = token;
   }
   return axiosConfig;

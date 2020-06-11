@@ -10,62 +10,36 @@ const store = new Vuex.Store({
     switchPage: '/teamwork/team/myself',
     // 用户信息
     userInfo: {
-      username: '',
+      username: 'username',
       avatar: '',
       id: '',
-      teamList: [],
-      name: '',
+      name: 'name',
     },
+    teamList: [],
+    nowTeam: '',
     // 团队信息
     teamInfo: {
       id: '',
-      desc: '',
+      desc: 'desc',
+      name: 'teamname',
       leader_id: '',
+      isNormalLogin: false,
       members: [
-        {
-          id: 1,
-          name: 'azoux',
-          avatar: 'https://pic3.zhimg.com/v2-c073bf0fa922e7c131d070a79cb933dd_im.jpg',
-        },
-        {
-          id: 2,
-          name: 'azoux',
-          avatar: 'https://pic3.zhimg.com/v2-c073bf0fa922e7c131d070a79cb933dd_im.jpg',
-        },
-        {
-          id: 3,
-          name: ' 阿三大苏打阿萨',
-          avatar: 'https://pic3.zhimg.com/v2-c073bf0fa922e7c131d070a79cb933dd_im.jpg',
-        },
-        {
-          id: 4,
-          name: '完颜阿骨打',
-          avatar: 'https://pic3.zhimg.com/v2-c073bf0fa922e7c131d070a79cb933dd_im.jpg',
-        },
-        {
-          id: 5,
-          name: 'azasdasdasdoux',
-          avatar: '//i1.hdslb.com/bfs/face/33e1596178b102469c9e2daa0619179eb1223fb5.jpg@77w_78h_1c_100q.webp',
-        },
-        {
-          id: 6,
-          name: 'aasdasdasdzoux',
-          avatar: 'https://pic3.zhimg.com/v2-c073bf0fa922e7c131d070a79cb933dd_im.jpg',
-        },
-        {
-          id: 7,
-          name: 'azoux',
-          avatar: 'https://pic3.zhimg.com/v2-c073bf0fa922e7c131d070a79cb933dd_im.jpg',
-        },
 
       ],
-      inv_url: 'https://pic3.zhimg.com/v2-c073bf0fa922e7c131d070a79cb933dd_im.jpg',
+      inv_url: '',
       check_s: '',
       check_e: '',
     },
     createTeam: false,
     // 是否刷新token
     isRefresh: false,
+    // 是否打开下发任务框
+    isSendTask: false,
+    // 本人是否已经打卡&团队打卡人数
+    isSign: false,
+    // 当前打卡总数
+    presentSign: 0,
   },
   mutations: {
     createTeamChange(state, payload) {
@@ -81,13 +55,39 @@ const store = new Vuex.Store({
     updateUserInfo(state, payload) {
       state.userInfo = payload;
       Storage.localSet('userInfo', state.userInfo);
+      console.log('now userInfo');
       console.log(payload);
     },
     updateNowTeam(state, payload) {
       state.teamInfo = payload;
+      // 处理一下邀请码
+      const invUrl = state.teamInfo.inv_url.split('=');
+      // eslint-disable-next-line prefer-destructuring
+      state.teamInfo.inv_url = invUrl[1];
+      console.log(invUrl);
+      console.log('now teamInfo');
+      console.log(payload);
     },
     addTeamToList(state, payload) {
       state.teamList.push(payload);
+    },
+    changeNormalLogin(state) {
+      state.isNormalLogin = false;
+    },
+    pushTeam2List(state, payload) {
+      // 用于添加团队进入；列表，便于后续切换
+      state.teamList.push(payload);
+      console.log(state.teamList);
+    },
+    changeSendtask(state) {
+      state.isSendTask = !state.isSendTask;
+    },
+    changeSignStatus(state, payload) {
+      state.isSign = payload.sign;
+    },
+    changePresentSign(state, payload) {
+      state.presentSign = payload.present;
+      console.log(state.presentSign);
     },
   },
   actions: {

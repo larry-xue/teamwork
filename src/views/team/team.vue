@@ -3,14 +3,9 @@
     <div class="nav">
       <teamNav></teamNav>
     </div>
-    <vue-scroll
-      slot="refresh-start"
-      ref="body"
-    >
-      <div class="body">
-        <router-view></router-view>
-      </div>
-    </vue-scroll>
+    <div class="body">
+      <router-view></router-view>
+    </div>
     <el-dialog
       title="创建新团队" :visible="createTeam" @close="() => {this.createTeamChange({choose: false})}">
       <el-form :model="createInfo" :rules="rules" ref="createInfo">
@@ -65,7 +60,8 @@
 
 <script>
 import { mapState, mapMutations } from 'vuex';
-import Storage from '../../storage/storage';
+// import Storage from '../../storage/storage';
+import init from '../../init/init';
 import teamNav from '../../components/nav.vue';
 
 export default {
@@ -73,22 +69,7 @@ export default {
     teamNav,
   },
   mounted() {
-    // 初始化用户信息
-    const userInfo = Storage.localGet('userInfo');
-    if (userInfo !== null) {
-      this.$store.commit('updateUserInfo', userInfo);
-    } else {
-      // 发送请求
-      this.$http.get('/v1/users').then((res) => {
-        this.$store.commit('updateUserInfo', res.data.data);
-        // 初始化群组信息
-        this.$http.get(`/v1/teams/${res.data.data.team_id[0]}`).thne((response) => {
-          this.$store.commit('updateNowTeam', response.data.data);
-        }).catch((err) => {
-          console.log(err);
-        });
-      });
-    }
+    init();
   },
   data() {
     // eslint-disable-next-line no-unused-vars
@@ -152,6 +133,7 @@ export default {
         ],
       },
       formLabelWidth: '120px',
+      loading: true,
     };
   },
   computed: {
@@ -167,6 +149,7 @@ export default {
     ]),
     onCreateTeam(formName) {
       this.$refs[formName].validate((valid) => {
+        console.log(this.createInfo);
         if (valid) {
           this.$http.post('/v1/teams', this.createInfo).then((res) => {
             console.log(res);
@@ -203,6 +186,6 @@ export default {
 
   .body {
     width: 100vw;
-    max-height: 800px;
+    min-height: 900px;
   }
 </style>

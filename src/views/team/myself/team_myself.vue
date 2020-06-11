@@ -4,14 +4,14 @@
       <div class="user-pic">
           <el-image
             fit="cover"
-            src="https://pic2.zhimg.com/50/v2-ba20cb47fe601127f05fac1c72934d51_hd.jpg"
-            :preview-src-list="['https://avatar-alioss.tower.im/0785345197ebc5c177ec?t=1589715857']">
+            :src="userInfo.avatar"
+          >
           </el-image>
       </div>
       <div class="user-info-detail">
-        <div class="user-name">Azoux</div>
+        <div class="user-name">{{ userInfo.name }}</div>
         <div class="user-say">
-          <el-link v-if="showSaying" href="#" type="primary">ddddd</el-link>
+          <el-link v-if="showSaying" href="#" type="primary">这是签名</el-link>
           <el-input v-else v-model="input" placeholder="edit"></el-input>
         </div>
       </div>
@@ -21,7 +21,9 @@
       <el-menu
         :default-active="activeIndex" class="el-menu-demo" mode="horizontal"
         @select="switch_user_nav">
-        <el-menu-item index="1">任务</el-menu-item>
+        <el-menu-item index="1">
+          <router-link to="/team/myself/todos">任务</router-link>
+        </el-menu-item>
         <el-menu-item index="2">日程</el-menu-item>
         <el-menu-item index="3">
           <router-link to="/team/myself/settings">设置</router-link>
@@ -37,7 +39,14 @@
 </template>
 
 <script>
+import { mapState } from 'vuex';
+
 export default {
+  computed: {
+    ...mapState({
+      userInfo: (state) => state.userInfo,
+    }),
+  },
   data() {
     return {
       showSaying: true,

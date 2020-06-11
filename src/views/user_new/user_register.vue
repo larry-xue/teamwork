@@ -160,7 +160,7 @@ export default {
         let val = true;
         if (valid) {
           console.log(this.ruleForm);
-          this.$http.post('https://www.fastmock.site/mock/df920649f50c9cd2392aa7389a2504d3/teamwork/users/register', {
+          this.$http.post('/v1/users', {
             username: this.ruleForm.username,
             email: this.ruleForm.email + this.ruleForm.select,
             password: md5(this.ruleForm.password),
