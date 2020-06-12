@@ -178,6 +178,7 @@ export default {
       console.log(day.getMonth() + 1, day.getFullYear());
       this.curentYear = day.getFullYear();
       this.curentMonth = day.getMonth() + 1;
+      this.updateTodos();
     },
     curentMonth() {
       this.updateCalendar();
@@ -185,11 +186,6 @@ export default {
   },
   mounted() {
     this.updateCalendar();
-    setTimeout(() => {
-      // const el = document.getElementsByClassName('is-selected');
-      // const today = el[0].children[0].children[0].getAttribute('day').split('-')[2];
-      // this.updateTodos();
-    }, 2000);
   },
   computed: {
     ...mapState({

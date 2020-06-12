@@ -9,10 +9,33 @@
       <el-collapse>
         <el-collapse-item>
           <template slot="title">
-            一致性 Consistency<i class="header-icon el-icon-info"></i>
+            打卡情况查询<i class="header-icon el-icon-info"></i>
           </template>
-          <div>与现实生活一致：与现实生活的流程、逻辑保持一致，遵循用户习惯的语言和概念；</div>
-          <div>在界面中一致：所有的元素和结构需保持一致，比如：设计样式、图标和文本、元素的位置等。</div>
+          <el-date-picker
+            v-model="queryAttendancesDate"
+            align="right"
+            type="date"
+            value-format="yyyy-MM-dd"
+            placeholder="选择日期"
+            :picker-options="pickerOptions">
+          </el-date-picker>
+          <el-button
+            style="margin-top: 10px"
+            type="primary" size="mini" @click="queryAttendancesDetail">查询具体打卡情况</el-button>
+          <el-divider></el-divider>
+          <el-card>
+            <div slot="header">
+              {{ showAttendancesDate }} 打卡情况：
+            </div>
+            <div class="attendances-item"
+              v-for="item in showAttendancesMember"
+              :key="item.id"
+            >
+              <div>{{ item.name }}</div>
+              <div v-if="item.punctual">已打卡</div>
+              <div v-else style="color: #bbb">未打卡</div>
+            </div>
+          </el-card>
         </el-collapse-item>
         <el-collapse-item title="团队信息">
           <el-card class="box-card">
@@ -129,6 +152,10 @@
 import { mapState } from 'vuex';
 
 export default {
+  mounted() {
+    const d = new Date();
+    this.queryAttendancesDate = `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
+  },
   computed: {
     ...mapState({
       teamInfo: (state) => state.teamInfo,
@@ -179,9 +206,69 @@ export default {
       seeTeamAction: false,
       inv_man_id: '',
       multipleSelection: [],
+      //
+      queryAttendancesDate: '',
+      showAttendancesDate: '',
+      showAttendancesMember: [],
+      pickerOptions: {
+        disabledDate(time) {
+          return time.getTime() > Date.now();
+        },
+      },
     };
   },
   methods: {
+    queryAttendancesDetail() {
+      if (this.queryAttendancesDate) {
+        const send = {
+          date: this.queryAttendancesDate,
+        };
+        if (this.userInfo.id === this.teamInfo.leader_id) {
+          send.spec = true;
+        } else {
+          send.self = true;
+        }
+        // 请求具体打卡信息
+        this.$http.get(`/v1/teams/${this.teamInfo.id}/attendances`, {
+          params: send,
+        }).then((res) => {
+          console.log(res);
+          this.showAttendancesDate = this.queryAttendancesDate;
+          const resData = res.data.data;
+          // 处理返回的结果---由于后台只记录了当日打卡了的人的，并没有记录没有打卡的
+          // 并且团队成员的加入时间也没有记录，所以在显示过往打卡记录时，晚加入的成员都没有打卡，这是一个比较明显的失误
+          const resultArr = [];
+          for (let i = 0; i < this.teamInfo.members.length; i += 1) {
+            // 直接两遍循环过滤了，量不是很大
+            // 最终希望拿到的数组是每项为{ id， name，打卡情况 }
+            resultArr.push({
+              id: this.teamInfo.members[i].id,
+              name: this.teamInfo.members[i].name,
+              punctual: false,
+            });
+            for (let k = 0; k < resData.length; k += 1) {
+              if (this.teamInfo.members[i].id === resData[k].uid) {
+                resultArr[resultArr.length - 1].punctual = true;
+                resData.splice(k, 1);
+                break;
+              }
+            }
+          }
+          this.showAttendancesMember = resultArr;
+          console.log(resultArr);
+        }).catch((err) => {
+          this.$message({
+            message: err,
+            type: 'warning',
+          });
+        });
+        console.log(send);
+      } else {
+        this.$message({
+          message: '请选择打卡日期',
+        });
+      }
+    },
     onCreateTeam(formName) {
       // eslint-disable-next-line consistent-return
       this.$refs[formName].validate((valid) => {
@@ -346,5 +433,8 @@ export default {
 </script>
 
 <style scoped>
-
+  .attendances-item {
+    display: flex;
+    justify-content: space-between;
+  }
 </style>

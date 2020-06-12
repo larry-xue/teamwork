@@ -15,7 +15,7 @@
         <div class="optItem" @click="semdWordToMan">
           下发任务
         </div>
-        <div class="optItem">
+        <div class="optItem" @click="queryHisTasks">
           他的任务
         </div>
         <i class="el-icon-more" slot="reference"></i>
@@ -48,11 +48,24 @@ export default {
       if (this.userInfo.id === this.teamInfo.leader_id) {
         // 打开任务框
         this.$store.commit('changeSendtask');
+        this.$store.commit('changeNowReceiveUser', this.$props.item);
         console.log(this.$props.item);
       } else {
         this.$message({
           type: 'error',
           message: '你不是队长，无权操作',
+        });
+      }
+    },
+    queryHisTasks() {
+      if (this.userInfo.id !== this.teamInfo.leader_id) {
+        this.$message({
+          type: 'warning',
+          message: '你没有操作权限',
+        });
+      } else {
+        this.$store.commit('changeNowQueryId', {
+          id: this.$props.item.id,
         });
       }
     },

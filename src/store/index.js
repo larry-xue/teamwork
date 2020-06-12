@@ -40,6 +40,10 @@ const store = new Vuex.Store({
     isSign: false,
     // 当前打卡总数
     presentSign: 0,
+    // 当前被查看任务成员的id
+    nowQueryId: '',
+    // 接收任务的成员
+    nowReceiveUser: {},
   },
   mutations: {
     createTeamChange(state, payload) {
@@ -88,6 +92,12 @@ const store = new Vuex.Store({
     changePresentSign(state, payload) {
       state.presentSign = payload.present;
       console.log(state.presentSign);
+    },
+    changeNowQueryId(state, payload) {
+      state.nowQueryId = payload.id;
+    },
+    changeNowReceiveUser(state, payload) {
+      state.nowReceiveUser = payload;
     },
   },
   actions: {

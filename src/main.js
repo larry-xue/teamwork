@@ -26,6 +26,9 @@ axios.interceptors.request.use((config) => {
   if (token) {
     token = `${'Bearer '}${token}`;
     axiosConfig.headers.Authorization = token;
+  } else {
+    token = `${'Bearer '}${Storage.localGet('refresh_token')}`;
+    axiosConfig.headers.Authorization = token;
   }
   return axiosConfig;
 }, (err) => {

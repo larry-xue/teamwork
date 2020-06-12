@@ -12,14 +12,16 @@
 */
 import axios from 'axios';
 import store from '../store/index';
+// import router
+// import router from './router';
 import Storage from '../storage/storage';
 
 let isInit = false;
 // 返回登录页
 function back2Login() {
-  this.$router.push({
-    path: '/user/login',
-  });
+  // this.$router.push({
+  //   path: '/user/login',
+  // });
 }
 
 // 处理一下打卡时间
@@ -106,19 +108,21 @@ function init() {
       // axios.get('https://www.fastmock.site/mock/df920649f50c9cd2392aa7389a2504d3/teamwork/v1/teams').then((response) => {
       queryTeamInfo(res.data.data.team_id);
     }).catch((err) => {
+      console.log(err.response.statusText);
       // token过期
-      console.log(err);
-      if (err.status === 403) {
+      if (err.response.statusText === 'FORBIDDEN') {
         // token过期
         // 如果存有refresh_token
         if (Storage.localGet('refresh_token') !== null) {
           Storage.localRemove('token');
-          axios.get('/v1/users').then((res) => {
+          console.log('in');
+          axios.get('/v1/users/token').then((res) => {
             isInit = true;
+            console.log(res);
             Storage.localSet('token', res.data.data.access_token);
             Storage.localSet('refresh_token', res.data.data.refresh_token);
-            store.commit('updateUserInfo', res.data.data);
-            queryTeamInfo(res.data.data.team_id);
+            // token更新完刷新页面
+            window.location.reload();
           }).catch((error) => {
             console.log(error);
           });

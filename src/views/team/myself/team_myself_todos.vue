@@ -41,7 +41,7 @@
             >
               <el-collapse>
                 <el-collapse-item
-                  v-for="item in userTodosNotDo"
+                  v-for="item in userTodosDone"
                   :key="item.id"
                   :title="item.title"
                 >
@@ -95,6 +95,7 @@ export default {
       currentPageTodo: 1,
       currentPageDone: 1,
       currentCollapse: '',
+      storeCurrentPage: 1,
     };
   },
   methods: {
@@ -133,30 +134,28 @@ export default {
         // 未完成
         this.totalDo = total;
         this.userTodosNotDo = todos;
+        this.currentPageTodo = this.storeCurrentPage;
       } else if (status === 1) {
+        console.log('in');
         this.userTodosDone = todos;
         this.totalDone = total;
+        this.currentPageDone = this.storeCurrentPage;
       }
     },
     queryAnotherPage(val) {
-      console.log(val);
+      this.storeCurrentPage = val;
       let stat = 1;
       // this.currentPageDone = val;
       if (this.currentCollapse === '1') {
         stat = 0;
         // this.currentPageTodo = val;
       }
-      console.log(this.currentPageTodo);
+      console.log(this.currentCollapse);
       this.queryTasks({
         page: val,
         status: stat,
         uid: this.userInfo.id,
       });
-      if (this.currentCollapse === '1') {
-        this.totalDo = this.userTodosNotDo.length;
-      } else {
-        this.totalDone = this.userTodosDone.length;
-      }
     },
   },
 };
