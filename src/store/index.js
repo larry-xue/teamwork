@@ -16,7 +16,6 @@ const store = new Vuex.Store({
       name: 'name',
     },
     teamList: [],
-    nowTeam: '',
     // 团队信息
     teamInfo: {
       id: '',
@@ -44,11 +43,24 @@ const store = new Vuex.Store({
     nowQueryId: '',
     // 接收任务的成员
     nowReceiveUser: {},
+    // 当前打开的markdown文档id
+    nowMDId: '',
+    // 当前打开的md文档
+    nowOpenMDText: '',
+    // markdown文档列表
+    mdList: [],
+    // 当前打开的富文本文档id
+    nowWordId: '',
+    // 当前打开的富文本
+    nowOpenWordText: '',
+    // 富文本文档列表
+    wordList: [],
+    // 去提交任务
+    gotoSubmitTask: {},
   },
   mutations: {
     createTeamChange(state, payload) {
       state.createTeam = payload.choose;
-      console.log('sadasd');
     },
     changePage(state, payload) {
       state.switchPage = payload.name;
@@ -73,7 +85,11 @@ const store = new Vuex.Store({
       console.log(payload);
     },
     addTeamToList(state, payload) {
-      state.teamList.push(payload);
+      // 由于不是用url识别团队的...所以就默认每次都将数组的第一个作为当前团队
+      // 如果当前团队更新了的话...就shift unshift
+      // 或者说切换团队了的话
+      state.teamList.shift();
+      state.teamList.unshift(payload);
     },
     changeNormalLogin(state) {
       state.isNormalLogin = false;
@@ -81,7 +97,6 @@ const store = new Vuex.Store({
     pushTeam2List(state, payload) {
       // 用于添加团队进入；列表，便于后续切换
       state.teamList.push(payload);
-      console.log(state.teamList);
     },
     changeSendtask(state) {
       state.isSendTask = !state.isSendTask;
@@ -98,6 +113,29 @@ const store = new Vuex.Store({
     },
     changeNowReceiveUser(state, payload) {
       state.nowReceiveUser = payload;
+    },
+    changeNowMDId(state, payload) {
+      state.nowMDId = payload.id;
+    },
+    changemdList(state, payload) {
+      state.mdList = payload;
+    },
+    changeNowWordId(state, payload) {
+      state.nowWordId = payload.id;
+    },
+    changeWordList(state, payload) {
+      state.wordList = payload;
+    },
+    changeSubmitTask(state, payload) {
+      state.gotoSubmitTask = payload;
+    },
+    changeNowOpenMDText(state, payload) {
+      state.nowOpenMDText = payload.text;
+      state.nowMDId = '';
+    },
+    changeNowOpenWordText(state, payload) {
+      state.nowOpenWordText = payload.text;
+      state.nowWordId = '';
     },
   },
   actions: {

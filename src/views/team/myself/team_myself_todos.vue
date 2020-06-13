@@ -19,6 +19,10 @@
                   </div>
                   <div class="todo-deadline">
                     <i class="el-icon-time">{{ item.deadline }}</i>
+                    <div style="float: right; padding-right: 20px;">
+                      <el-button size="mini" type="primary"
+                        @click="gotoSubmit(item)">去提交任务</el-button>
+                    </div>
                   </div>
                 </el-collapse-item>
               </el-collapse>
@@ -50,6 +54,10 @@
                   </div>
                   <div class="todo-deadline">
                     <i class="el-icon-time">{{ item.deadline }}</i>
+                  </div>
+                  <div style="float: right; padding-right: 20px;">
+                    <el-button size="mini" type="primary"
+                      @click="gotoSubmit(item)">修改任务提交</el-button>
                   </div>
                 </el-collapse-item>
               </el-collapse>
@@ -99,6 +107,15 @@ export default {
     };
   },
   methods: {
+    // 去提交任务
+    gotoSubmit(item) {
+      this.$message({
+        type: 'success',
+        message: '任务已经选择！快去提交吧！',
+        showClose: true,
+      });
+      this.$store.commit('changeSubmitTask', item);
+    },
     changeType(val) {
       this.currentCollapse = val;
       if (this.userTodosNotDo.length === 0 && val === '1') {

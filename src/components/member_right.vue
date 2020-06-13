@@ -150,6 +150,7 @@
 
 <script>
 import { mapState } from 'vuex';
+import Storage from '../storage/storage';
 
 export default {
   mounted() {
@@ -294,9 +295,14 @@ export default {
               type: 'info',
               message: '团队信息修改成功!',
             });
-            this.$store.commit('addTeamToList', {
-              name: res.data.data.name,
-              id: res.data.data.id,
+            // 请求最新团队信息
+            this.$http.get(`/v1/teams/${this.teamInfo.id}`).then((response) => {
+              this.$store.commit('updateNowTeam', response.data.data);
+              Storage.localSet('teamInfo', response.data.data);
+              this.$store.commit('addTeamToList', {
+                name: response.data.data.name,
+                id: response.data.data.id,
+              });
             });
           }).catch((err) => {
             console.log(err);
@@ -372,6 +378,7 @@ export default {
         }).then((res) => {
           console.log(res);
           this.$store.commit('updateNowTeam', res.data.data);
+          Storage.localSet('teamInfo', res.data.data);
         });
       } else {
         this.$message({

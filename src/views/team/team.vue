@@ -181,11 +181,11 @@ export default {
 
 <style scoped>
   .nav {
-    width: 100vw;
+    width: 99.9vw;
   }
 
   .body {
-    width: 100vw;
-    min-height: 900px;
+    width: 99vw;
+    max-height: 100vh;
   }
 </style>

@@ -14,7 +14,7 @@
         width="50%">
         <h3>保存markdown文档:</h3>
         <el-divider></el-divider>
-        <el-input maxlength="30" v-model="mdName" placeholder="请输入文档名称"></el-input>
+        <el-input maxlength="30" v-model.trim="mdName" placeholder="请输入文档名称"></el-input>
         <el-divider></el-divider>
         <el-button type="primary" @click="localSave">保存文档</el-button>
       </el-dialog>
@@ -22,11 +22,20 @@
 </template>
 
 <script>
+import { mapState } from 'vuex';
 import { mavonEditor } from 'mavon-editor';
 import Storage from '../storage/storage';
 import 'mavon-editor/dist/css/index.css';
 
 export default {
+  computed: {
+    ...mapState({
+      nowMDId: (state) => state.nowMDId,
+      mdList: (state) => state.mdList,
+      userInfo: (state) => state.userInfo,
+      nowOpenMDText: (state) => state.nowOpenMDText,
+    }),
+  },
   name: '',
   props: [],
   components: {
@@ -56,13 +65,52 @@ export default {
     },
     // 保存
     localSave() {
-      // 存到本地localStorage---markdown
-      if (Storage.localGet('markdown') === null) {
-        Storage.localSet('markdown', []);
+      if (this.mdName === '') {
+        this.$message({
+          message: '文档名不能为空！',
+        });
+      } else if (this.nowMDId !== '') {
+        // 更新md
+        const markdown = Storage.localGet('markdown');
+        markdown[this.nowMDId] = this.content;
+        Storage.localSet('markdown', markdown);
+        // 更新名称
+        const mdList = Storage.localGet('mdList');
+        for (let i = 0; i < mdList.length; i += 1) {
+          if (mdList[i].id === this.nowMDId) {
+            mdList[i].name = this.mdName;
+            Storage.localSet('mdList', mdList);
+            break;
+          }
+        }
+        this.$message({
+          message: '保存成功！',
+        });
+        this.openSubmit = false;
+      } else {
+        // 以当前时间作为id
+        // 先用id存文档
+        const Tid = Date.parse(new Date());
+        const markdown = Storage.localGet('markdown');
+        markdown[Tid] = this.content;
+        Storage.localSet('markdown', markdown);
+        // 插入到list
+        const mdList = Storage.localGet('mdList');
+        mdList.push({
+          name: this.mdName,
+          creator: this.userInfo.name,
+          id: Tid,
+        });
+        Storage.localSet('mdList', mdList);
+        this.$message({
+          message: '保存成功！',
+        });
+        // 修改当前id否则会再创建一个文档
+        this.$store.commit('changeNowMDId', {
+          id: Tid,
+        });
+        this.openSubmit = false;
       }
-      const prv = Storage.localGet('markdown');
-      // 先遍历
-      console.log(prv);
     },
     // 提交
     submit() {
@@ -70,9 +118,40 @@ export default {
     },
   },
   mounted() {
-
+    // 如果没有markdown就创建一下
+    if (Storage.localGet('markdown') === null) {
+      Storage.localSet('markdown', {});
+    }
+    if (Storage.localGet('mdList') === null) {
+      Storage.localSet('mdList', []);
+    }
+    //
+    // localStorage: markdown & mdList
+    // markdown: { 1: doc1, 2: doc2 }
+    // mdList: [ {creator: 'aaa', id: 1, name: 'docname} ]
+    //
+    // 如果有mdId则从localstorage中找出文档
+    if (this.nowMDId !== '') {
+      const mdList = Storage.localGet('mdList');
+      for (let i = 0; i < mdList.length; i += 1) {
+        if (mdList[i].id === this.nowMDId) {
+          const markdown = Storage.localGet('markdown');
+          if (markdown !== null) {
+            this.mdName = mdList[i].name;
+            this.content = markdown[this.nowMDId];
+            break;
+          }
+        }
+      }
+    } else if (this.nowOpenMDText !== '') {
+      this.content = this.nowOpenMDText;
+    }
   },
 };
+
+// window.onbeforeunload = () => {
+//   console.log(11111111111111);
+//   window.alert('asd');
 </script>
 
 <style scoped>

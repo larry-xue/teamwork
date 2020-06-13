@@ -60,7 +60,8 @@
                 <div class="todoOpt">
                   <el-button type="warning" size="mini" @click="openEditTodo(item)">编辑</el-button>
                   <el-button type="danger"  size="mini" @click="delTodoItem(item)">删除</el-button>
-                  <el-button type="success"  size="mini" @click="copy($event)">复制</el-button>
+                  <el-button type="success"  size="mini"
+                    @click="copy($event, item.desc)">复制</el-button>
                 </div>
                  <el-link
                   :underline="false"
@@ -265,8 +266,9 @@ export default {
         };
       }
     },
-    copy(ee) {
-      const clipboard = new Clipboard(ee.target, { text: () => '复制的内容' });
+    copy(ee, content) {
+      console.log(ee);
+      const clipboard = new Clipboard(ee.target, { text: () => content });
       clipboard.on('success', () => {
         this.$notify({ type: 'success', message: '复制成功', duration: 2000 });
         clipboard.destroy(); // 释放内存
@@ -507,7 +509,6 @@ export default {
   .todoItem {
     max-width: 80%;
     display: block;
-    padding: 10px;
     margin-top: 10px;
     color: white;
     word-break: break-all;

@@ -61,7 +61,7 @@
           <div class="otherMethod">
             <div>
               <el-link
-                href="/user/login"
+                href="/#/user/login"
                 type="success"
                 icon="el-icon-s-promotion"
               >

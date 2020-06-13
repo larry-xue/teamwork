@@ -4,7 +4,7 @@
       <div class="logo">
         <el-dropdown @command="handleCommand">
           <span class="el-dropdown-link">
-            {{nowTeam}}<i class="el-icon-arrow-down el-icon--right"></i>
+            {{teamInfo.name}}<i class="el-icon-arrow-down el-icon--right"></i>
           </span>
           <el-dropdown-menu slot="dropdown">
             <el-dropdown-item disabled>切换团队</el-dropdown-item>
@@ -20,6 +20,9 @@
             >
               创建新团队
             </el-dropdown-item>
+            <el-dropdown-item command='logout'>
+              退出登录
+            </el-dropdown-item>
           </el-dropdown-menu>
         </el-dropdown>
       </div>
@@ -28,7 +31,7 @@
         <li @click="switchPage('/team/calendar')">日历</li>
         <li @click="switchPage('/team/member')">团队</li>
         <li @click="switchPage('/team/affair')">办公</li>
-        <li @click="switchPage('/team/myself')">自己</li>
+        <li @click="switchPage('/team/myself/todos')">自己</li>
       </ul>
     </nav>
   </div>
@@ -36,13 +39,14 @@
 
 <script>
 import { mapState, mapMutations } from 'vuex';
+// import Storage from '../storage/storage';
 
 export default {
   computed: {
     ...mapState({
       createTeam: (state) => state.createTeam,
       teamList: (state) => state.teamList,
-      nowTeam: (state) => state.nowTeam,
+      teamInfo: (state) => state.teamInfo,
     }),
   },
   data() {
@@ -55,6 +59,16 @@ export default {
       if (e === 'create') {
         this.createTeamChange({
           choose: true,
+        });
+      } else if (e === 'logout') {
+        // 登出--先清除localstorage的数据，然后跳转页面
+        // Storage.localRemove('token');
+        // Storage.localRemove('refresh_token');
+        // Storage.localRemove('userInfo');
+        // Storage.localRemove('teamInfo');
+        // 跳转
+        this.$router.push({
+          name: 'login',
         });
       }
     },

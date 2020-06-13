@@ -4,7 +4,7 @@
   <div class="main">
     <div class="wrapper">
       <div class="head-name">
-        Team work
+        Team Work
       </div>
       <div class="input-body">
         <el-form :model="ruleForm" :rules="rules" ref="ruleForm">
@@ -47,7 +47,7 @@
         <el-divider content-position="center">
         </el-divider>
         <div class="registor">
-          <el-link href="/user/register" @click="gotoRegister">
+          <el-link href="/#/user/register" @click="gotoRegister">
             没有账号？立即注册
           </el-link>
         </div>
@@ -142,6 +142,15 @@ export default {
               if (this.loginNextTime) {
                 Storage.localSet('refresh_token', res.data.data.refresh_token);
               }
+              // 跳转
+              this.$message({
+                message: '登录成功！正在跳转页面中~~',
+              });
+              setTimeout(() => {
+                this.$router.push({
+                  name: 'library',
+                });
+              }, 1000);
             }
             if (meg !== '') {
               this.$message({

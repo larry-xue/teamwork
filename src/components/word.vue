@@ -1,4 +1,5 @@
 <template>
+<!-- 写在开头--word基本上就是markdown的复刻（指存储的实现以及编辑） -->
   <div>
     <el-card style="height: 610px;">
       <quill-editor
@@ -52,7 +53,19 @@
         </div>
       </quill-editor>
     </el-card>
-      <el-button type="primary" @click="quillSubmit">提交</el-button>
+      <div class="submit">
+        <h3>在这里提交嗷</h3>
+        <el-button type="success" size="medium" plain @click="submit">提交</el-button>
+      </div>
+      <el-dialog
+        :visible.sync="openSubmit"
+        width="50%">
+        <h3>保存富文本文档:</h3>
+        <el-divider></el-divider>
+        <el-input maxlength="30" v-model.trim="wordName" placeholder="请输入文档名称"></el-input>
+        <el-divider></el-divider>
+        <el-button type="primary" @click="localSave">保存文档</el-button>
+      </el-dialog>
   </div>
 </template>
 
@@ -70,6 +83,8 @@ import 'quill/dist/quill.bubble.css';
 
 // 引入font.css
 import '../assets/font.css';
+import { mapState } from 'vuex';
+import Storage from '../storage/storage';
 
 // 自定义字体大小
 const Size = Quill.import('attributors/style/size');
@@ -89,9 +104,17 @@ export default {
   components: {
     quillEditor,
   },
+  computed: {
+    ...mapState({
+      nowWordId: (state) => state.nowWordId,
+      wordList: (state) => state.mdList,
+      userInfo: (state) => state.userInfo,
+      nowOpenWordText: (state) => state.nowOpenWordText,
+    }),
+  },
   data() {
     return {
-      content: '<p><strong>sdassss</strong></p>',
+      content: '',
       editorOption: {
         placeholder: '请输入',
         theme: 'snow', // or 'bubble'
@@ -101,16 +124,125 @@ export default {
           },
         },
       },
+      openSubmit: false,
+      wordName: '',
     };
   },
   methods: {
     quillSubmit() {
       // this.content = html;
-      console.log(this.content);
+      this.openSubmit = true;
+    },
+    // 将图片上传到服务器，返回地址替换到md中
+    // eslint-disable-next-line no-unused-vars
+    $imgAdd() {
+      this.$message({
+        message: '抱歉！暂不支持图片上传！请插入链接！',
+      });
+    },
+    // 所有操作都会被解析重新渲染
+    change(value, render) {
+      // render 为 word 解析后的结果[html]
+      this.html = render;
+    },
+    // 保存
+    localSave() {
+      if (this.wordName === '') {
+        this.$message({
+          message: '文档名不能为空！',
+        });
+      } else if (this.nowWordId !== '') {
+        // 更新md
+        const word = Storage.localGet('word');
+        word[this.nowWordId] = this.content;
+        Storage.localSet('word', word);
+        // 更新名称
+        const wordList = Storage.localGet('wordList');
+        for (let i = 0; i < wordList.length; i += 1) {
+          if (wordList[i].id === this.nowMDId) {
+            wordList[i].name = this.wordName;
+            Storage.localSet('wordList', wordList);
+            break;
+          }
+        }
+        this.$message({
+          message: '保存成功！',
+        });
+        this.openSubmit = false;
+      } else {
+        // 以当前时间作为id
+        // 先用id存文档
+        const Tid = Date.parse(new Date());
+        const word = Storage.localGet('word');
+        word[Tid] = this.content;
+        Storage.localSet('word', word);
+        // 插入到list
+        const wordList = Storage.localGet('wordList');
+        wordList.push({
+          name: this.wordName,
+          creator: this.userInfo.name,
+          id: Tid,
+        });
+        Storage.localSet('wordList', wordList);
+        this.$message({
+          message: '保存成功！',
+        });
+        // 和md相似
+        this.$store.commit('changeNowWordId', {
+          id: Tid,
+        });
+        this.openSubmit = false;
+      }
+    },
+    // 提交
+    submit() {
+      this.openSubmit = true;
     },
   },
+  mounted() {
+    // 如果没有word就创建一下
+    if (Storage.localGet('word') === null) {
+      Storage.localSet('word', {});
+    }
+    if (Storage.localGet('wordList') === null) {
+      Storage.localSet('wordList', []);
+    }
+    //
+    // localStorage: word & wordList
+    // word: { 1: doc1, 2: doc2 }
+    // wordList: [ {creator: 'aaa', id: 1, name: 'docname} ]
+    //
+    // 如果有mdId则从localstorage中找出文档
+    if (this.nowWordId !== '') {
+      const wordList = Storage.localGet('wordList');
+      for (let i = 0; i < wordList.length; i += 1) {
+        if (wordList[i].id === this.nowWordId) {
+          const word = Storage.localGet('word');
+          if (word !== null) {
+            this.wordName = wordList[i].name;
+            console.log(wordList[i]);
+            this.content = word[this.nowWordId];
+            break;
+          }
+        }
+      }
+    } else if (this.nowOpenWordText !== '') {
+      this.content = this.nowOpenWordText;
+    }
+  },
 };
+
 </script>
 
 <style scoped>
+  .submit {
+    position: absolute;
+    right: 47vw;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .submit h3 {
+    margin: 30px auto;
+  }
 </style>

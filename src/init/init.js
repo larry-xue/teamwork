@@ -69,6 +69,8 @@ function isSign(teamId) {
 function queryTeamInfo(teamId) {
   axios.get(`/v1/teams/${teamId[0]}`).then((response) => {
     store.commit('updateNowTeam', response.data.data);
+    // 更新本地数据
+    Storage.localSet('teamInfo', response.data.data);
     // 将信息push进teamList
     const teamInfo = response.data.data;
     isSign(teamInfo.id);
@@ -99,9 +101,19 @@ function init() {
     // 返回登录页
     back2Login();
   } else {
-  // axios.get('https://www.fastmock.site/mock/df920649f50c9cd2392aa7389a2504d3/teamwork/v1/users').then((res) => {
+    // 先从本地读取userInfo和teamInfo，等请求回来以后再更新=--虽然信息可能改变，但是id不会变，不会影响后续的请求
+    // 即使缓存被清空了影响也不大
+    const userInfo = Storage.localGet('userInfo');
+    const teamInfo = Storage.localGet('teamInfo');
+    if (teamInfo !== null) {
+      store.commit('updateNowTeam', teamInfo);
+    }
+    store.commit('updateUserInfo', userInfo);
+
     axios.get('/v1/users').then((res) => {
       store.commit('updateUserInfo', res.data.data);
+      // 更新本地数据
+      Storage.localSet('userInfo', res.data.data);
       // 初始化群组信息
       console.log(res);
       isInit = true;

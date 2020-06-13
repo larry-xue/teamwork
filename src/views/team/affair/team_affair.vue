@@ -64,7 +64,16 @@
                 v-for="item in userTodosDone"
                 :key="item.id"
                 shadow="hover">
-                {{ item.title }}
+                <!-- http://47.107.32.138/archives/61bca6a7d5404211acfb2d4de067b78c.xls -->
+                <div class="todo-item">
+                  <h5>{{ item.title }}</h5>
+                  <p>{{ item.desc }}</p>
+                </div>
+                <div class="more-info" style="float: right; cursor: pointer;">
+                  <el-tooltip class="item" effect="dark" content="查看详情 & 修改" placement="right">
+                    <i class="el-icon-more" @click="queryDeailTask(item)"></i>
+                  </el-tooltip>
+                </div>
               </el-card>
             </el-collapse-item>
           </el-collapse>
@@ -153,12 +162,29 @@
       </el-switch>
       <el-card style="margin-top: 30px;" shadow="hover">
         <div slot="header">当前已提交的任务文件：</div>
-        <p
+        <div
           v-for="(item, index) in nowEditUser.archives"
           :key="index"
         >
-          {{ item }}
-        </p>
+        <div style="margin-top: 5px;">
+            <el-link :href="'http://47.107.32.138' + item.archive_url"
+              icon="el-icon-document-copy" type="primary">
+              {{ item.name }}
+            </el-link>
+            <span
+              v-if="item.type == 3"
+              style="float: right; cursor: pointer; color: #bbb"
+              @click="copy($event, `http://47.107.32.138${item.archive_url}`)"
+            >
+              点击复制分享</span>
+            <span v-else
+              style="float: right; cursor: pointer; color: #bbb"
+              @click="previewDoc(item)"
+            >
+              点击预览
+            </span>
+          </div>
+        </div>
       </el-card>
     </el-dialog>
   </div>
@@ -166,6 +192,7 @@
 
 <script>
 import { mapState } from 'vuex';
+import Clipboard from 'clipboard';
 import memberItem from '../../../components/memberItem.vue';
 
 export default {
@@ -286,6 +313,44 @@ export default {
     }),
   },
   methods: {
+    // 文档预览
+    previewDoc(item) {
+      console.log(item);
+      const url = item.archive_url.split('/').pop();
+      this.$http.get(`/v1/archives/${url}`).then((res) => {
+        // 先判断是哪一种--再对呀操作
+        console.log(item);
+        if (item.type === 1) {
+          // md
+          this.$store.commit('changeNowOpenMDText', {
+            text: res.data,
+          });
+          this.$router.push({
+            name: 'markdown',
+          });
+        } else {
+          // word
+          this.$store.commit('changeNowOpenWordText', {
+            text: res.data,
+          });
+          this.$router.push({
+            name: 'word',
+          });
+        }
+      });
+    },
+    copy(ee, content) {
+      const clipboard = new Clipboard(ee.target, { text: () => content });
+      clipboard.on('success', () => {
+        this.$notify({ type: 'success', message: '复制成功', duration: 2000 });
+        clipboard.destroy(); // 释放内存
+      });
+      clipboard.on('error', () => {
+        this.$notify({ type: 'waning', message: '该浏览器不支持自动复制', duration: 2000 });
+        clipboard.destroy();
+      });
+      clipboard.onClick(ee); // 事件绑定
+    },
     // 用于再修改或删除后重载页面中的任务
     reloadTasks() {
       const send = {
