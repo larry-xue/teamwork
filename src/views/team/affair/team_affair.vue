@@ -325,17 +325,19 @@ export default {
           this.$store.commit('changeNowOpenMDText', {
             text: res.data,
           });
-          this.$router.push({
+          const routeUrl = this.$router.resolve({
             name: 'markdown',
           });
+          window.open(routeUrl.href, '_blank');
         } else {
           // word
           this.$store.commit('changeNowOpenWordText', {
             text: res.data,
           });
-          this.$router.push({
+          const routeUrl = this.$router.resolve({
             name: 'word',
           });
+          window.open(routeUrl.href, '_blank');
         }
       });
     },
@@ -531,8 +533,8 @@ export default {
 <style scoped>
   .affair  {
     width: 100%;
-    height: 800px;
-    margin-top: 50px;
+    height: 80vh;
+    margin-top: 20px;
     overflow: hidden;
   }
 

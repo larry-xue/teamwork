@@ -5,10 +5,11 @@
 </template>
 
 <script>
+import INIT from './init/init';
+
 export default {
   mounted() {
-    // 发送验证token的请求
-    // 如果token没有过期则加载页面
+    INIT.INIT();
   },
   data() {
     return {

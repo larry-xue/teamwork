@@ -6,8 +6,8 @@
             ref="md" @imgAdd="$imgAdd" @change="change" style="min-height: 600px"/>
       </div>
       <div class="submit">
-        <h3>在这里提交嗷</h3>
-        <el-button type="success" size="medium" plain @click="submit">提交</el-button>
+        <h3>在这里保存嗷</h3>
+        <el-button type="success" size="medium" plain @click="submit">保存</el-button>
       </div>
       <el-dialog
         :visible.sync="openSubmit"

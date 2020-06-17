@@ -61,7 +61,6 @@
 <script>
 import { mapState, mapMutations } from 'vuex';
 // import Storage from '../../storage/storage';
-import init from '../../init/init';
 import teamNav from '../../components/nav.vue';
 
 export default {
@@ -69,7 +68,6 @@ export default {
     teamNav,
   },
   mounted() {
-    init();
   },
   data() {
     // eslint-disable-next-line no-unused-vars
@@ -186,6 +184,6 @@ export default {
 
   .body {
     width: 99vw;
-    max-height: 100vh;
+    height: 80vh;
   }
 </style>

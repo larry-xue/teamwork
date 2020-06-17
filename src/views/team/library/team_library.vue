@@ -22,7 +22,17 @@
               <h4 :title="item.name">{{item.name}}</h4>
               <div>
                 <span>{{item.creator}}</span>
-                <i class="el-icon-edit" @click="openAndEdit(item,'markdown')"></i>
+                <el-popover
+                  placement="right"
+                  trigger="click"
+                  >
+                <p class="doc-edit-item"
+                @click="openAndEdit(item,'markdown')">编辑</p>
+                <p class="doc-edit-item"
+                @click="deleteThisDoc(item, 'markdown')"
+                >删除</p>
+                <i class="el-icon-more-outline" slot="reference"></i>
+                </el-popover>
               </div>
             </div>
           </div>
@@ -42,8 +52,18 @@
               <h4 :title="item.name">{{item.name}}</h4>
               <div>
                 <span>{{item.creator}}</span>
-                <i class="el-icon-edit"  @click="openAndEdit(item,'word')"></i>
-              </div>
+                <el-popover
+                  placement="right"
+                  trigger="click"
+                  >
+                  <p class="doc-edit-item"
+                  @click="openAndEdit(item,'word')">编辑</p>
+                  <p class="doc-edit-item"
+                  @click="deleteThisDoc(item, 'word')"
+                  >删除</p>
+                  <i class="el-icon-more-outline" slot="reference"></i>
+                </el-popover>
+                </div>
             </div>
           </div>
         </el-card>
@@ -213,6 +233,39 @@ export default {
     };
   },
   methods: {
+    // 删除本地文档
+    deleteThisDoc(item, name) {
+      let docList;
+      let doc;
+      let tempName = 'wordList';
+      if (name === 'word') {
+        docList = Storage.localGet('wordList');
+        doc = Storage.localGet('word');
+      } else {
+        docList = Storage.localGet('mdList');
+        doc = Storage.localGet('markdown');
+        tempName = 'mdList';
+      }
+      for (let i = 0; i < docList.length; i += 1) {
+        if (docList[i].id === item.id) {
+          docList.splice(i, 1);
+          doc[item.id] = undefined;
+          // 重新存储
+          Storage.localSet(name, doc);
+          Storage.localSet(tempName, docList);
+          // 更新store中的数组
+          if (name === 'word') {
+            this.$store.commit('changeNowWordId', docList);
+          } else {
+            this.$store.commit('changemdList', docList);
+          }
+          this.$message({
+            message: '删除成功！',
+          });
+          break;
+        }
+      }
+    },
     // 是否打开提交对话框
     tryToUpdate() {
       if (JSON.stringify(this.gotoSubmitTask) !== JSON.stringify({})) {
@@ -225,7 +278,6 @@ export default {
       }
     },
     // 上传文件
-    // eslint-disable-next-line consistent-return
     realUpload(file) {
       // 读取文件大小
       const fileSize = file.size;
@@ -361,17 +413,6 @@ export default {
 
 
 <style scoped>
-  .custom-tree-node {
-    align-items: center;
-    font-size: 14px;
-    padding-right: 8px;
-    transition: 3s ease-in-out;
-  }
-
-  .custom-tree-node:hover {
-    background: red;
-  }
-
   .upload {
     margin-top: 12px;
   }
@@ -379,13 +420,13 @@ export default {
   .work {
     width: 100%;
     margin-top: 20px;
-    padding-left: 50px;
+    padding-left: 20px;
     display: flex;
   }
 
   .work .navMenu {
     width: 25%;
-    height: 800px;
+    height: 80vh;
     background-color: #fff;
     min-width: 250px;
     padding: 10px;
@@ -436,5 +477,15 @@ export default {
   .doc-item div i {
     float: right;
     cursor: pointer;
+  }
+
+  .doc-edit-item {
+    padding: 3px 0;
+    cursor:pointer;
+    text-align: center;
+  }
+
+  .doc-edit-item:hover {
+    background-color: #ddd;
   }
 </style>

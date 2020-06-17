@@ -18,15 +18,13 @@ export default {
     ...mapState({
       teamInfo: (state) => state.teamInfo,
       userInfo: (state) => state.userInfo,
-      isSign: (state) => state.isSign,
       presentSign: (state) => state.presentSign,
     }),
     hadSign() {
-      console.log(this.presentSign);
       if (this.presentSign === 0) {
         return 0;
       }
-      return (this.presentSign / this.teamInfo.members.length) * 100;
+      return Number(((this.presentSign / this.teamInfo.members.length) * 100).toFixed(2));
     },
   },
   data() {
@@ -35,27 +33,49 @@ export default {
   },
   methods: {
     signIn() {
-      if (this.isSign) {
-        this.$message({
-          type: 'info',
-          message: '你今天已经打过卡啦',
-        });
-      } else {
-        this.$http.post(`/v1/teams/${this.teamInfo.id}/attendances`).then((res) => {
-          console.log(res);
+      const d = new Date();
+      const nowDay = `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
+      // 先判断是否已经打卡
+      this.$http.get(`/v1/teams/${this.teamInfo.id}/attendances`, {
+        params: {
+          date: nowDay,
+          self: true,
+        },
+      }).then((res) => {
+        if (res.data.data.punctual) {
           this.$message({
-            type: 'success',
-            message: '打卡成功!',
+            message: '你今天已经打过卡了!',
           });
-          this.$store.commit('changeSignStatus', {
-            sign: true,
-          });
-          console.log('asd');
-          this.$store.commit('changePresentSign', {
-            present: this.presentSign + 1,
-          });
-        });
-      }
+        }
+        if (JSON.stringify(res.data.data) === '{}') {
+          // 今天还未打卡
+          console.log(this.teamInfo.check_s, this.teamInfo.check_e);
+          // 判断时间
+          let start = this.teamInfo.check_s.split(':');
+          start = Number(start[0]) * 3600 + Number(start[1] * 60) + Number(start[2]);
+          let end = this.teamInfo.check_e.split(':');
+          end = Number(end[0]) * 3600 + Number(end[1] * 60) + Number(end[2]);
+          const now = d.getMinutes() * 60 + d.getHours() * 3600 + d.getSeconds() * 60;
+          if (start <= now && now <= end) {
+            // 顺利打卡
+            this.$http.post(`/v1/teams/${this.teamInfo.id}/attendances`).then((response) => {
+              console.log(response);
+              this.$message({
+                type: 'success',
+                message: '打卡成功!',
+              });
+              this.$store.commit('changeSignStatus', {
+                sign: true,
+              });
+            });
+          } else {
+            this.$message({
+              type: 'warning',
+              message: '当前不是打卡时间!',
+            });
+          }
+        }
+      });
     },
   },
 };

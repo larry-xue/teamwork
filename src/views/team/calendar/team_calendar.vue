@@ -543,7 +543,7 @@ export default {
   .calendar {
     width: 100%;
 
-    margin-top: 50px;
+    margin-top: 20px;
     display: flex;
   }
 

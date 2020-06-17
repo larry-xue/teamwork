@@ -11,8 +11,7 @@
       <div class="user-info-detail">
         <div class="user-name">{{ userInfo.name }}</div>
         <div class="user-say">
-          <el-link v-if="showSaying" href="#" type="primary">这是签名</el-link>
-          <el-input v-else v-model="input" placeholder="edit"></el-input>
+          <p style="padding: 5px;color:#999;font-size: 13px">id:{{userInfo.id}}</p>
         </div>
       </div>
     </div>
@@ -21,12 +20,14 @@
       <el-menu
         :default-active="activeIndex" class="el-menu-demo" mode="horizontal"
         @select="switch_user_nav">
-        <el-menu-item index="1">
-          <router-link to="/team/myself/todos">任务</router-link>
+        <el-menu-item index="1" @click="toSon(1)">
+          任务
         </el-menu-item>
-        <el-menu-item index="2">日程</el-menu-item>
-        <el-menu-item index="3">
-          <router-link to="/team/myself/settings">设置</router-link>
+        <el-menu-item  index="2">
+        日程
+        </el-menu-item>
+        <el-menu-item index="3" @click="toSon(3)">
+          设置
         </el-menu-item>
         <el-menu-item index="4" disabled>收藏</el-menu-item>
       </el-menu>
@@ -49,28 +50,19 @@ export default {
   },
   data() {
     return {
-      showSaying: true,
       activeIndex: '1',
     };
   },
   methods: {
-    switch_user_nav(key) {
-      switch (key) {
-        case '1':
-          console.log('test');
-          break;
-        case '2':
-          console.log('daily');
-          break;
-        case '3':
-          console.log('settings');
-          break;
-        case '4':
-          console.log('collect');
-          break;
-
-        default:
-          break;
+    toSon(e) {
+      if (e === 1) {
+        this.$router.push({
+          name: 'todo',
+        });
+      } else if (e === 3) {
+        this.$router.push({
+          name: 'settings',
+        });
       }
     },
   },
@@ -131,5 +123,9 @@ export default {
 
   .user-nav ul li:hover {
     background-color: #fff;
+  }
+
+  .user-name {
+    font-size: 21px;
   }
 </style>

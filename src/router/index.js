@@ -93,6 +93,29 @@ const routes = [
       },
     ],
   },
+
+  {
+    path: '/questionnaire',
+    component: () => import('../views/questionnaire/questionnaire.vue'),
+    children: [
+      {
+        path: '/questionnaire/create',
+        name: 'questionnaire_cr',
+        component: () => import('../views/questionnaire/questionnaire_cr.vue'),
+      },
+      {
+        name: 'questionnaire_fill',
+        path: '/questionnaire/fill',
+        component: () => import('../views/questionnaire/questionnaire_fill.vue'),
+      },
+      {
+        path: '/questionnaire/show',
+        name: 'questionnaire_show',
+        component: () => import('../views/questionnaire/questionnaire_show.vue'),
+      },
+    ],
+  },
+
 ];
 
 const router = new VueRouter({

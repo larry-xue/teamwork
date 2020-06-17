@@ -57,8 +57,17 @@ const store = new Vuex.Store({
     wordList: [],
     // 去提交任务
     gotoSubmitTask: {},
+    // 当前填写的问卷id
+    question: {},
+    // 当前需要展示的问卷的结果
+    nowQSForChart: {},
   },
   mutations: {
+    changeNowTeam(state, payload) {
+      state.teamList.shift();
+      state.teamList.push(payload);
+      this.teamInfo = payload;
+    },
     createTeamChange(state, payload) {
       state.createTeam = payload.choose;
     },
@@ -136,6 +145,12 @@ const store = new Vuex.Store({
     changeNowOpenWordText(state, payload) {
       state.nowOpenWordText = payload.text;
       state.nowWordId = '';
+    },
+    changeQID(state, payload) {
+      state.question = payload.qs;
+    },
+    changeNowQSForChart(state, payload) {
+      state.nowQSForChart = payload;
     },
   },
   actions: {

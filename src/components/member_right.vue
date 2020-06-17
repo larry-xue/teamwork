@@ -1,7 +1,7 @@
 // member页，右边栏
 <template>
   <div>
-    <div style="height: 900px; padding: 5px; padding-bottom: 20px">
+    <div style="height: 80vh; padding: 5px; padding-bottom: 20px">
       <vue-scroll
         slot="refresh-start"
         ref="body"
@@ -49,8 +49,8 @@
         </el-collapse-item>
         <el-collapse-item title="团队管理">
           <el-divider></el-divider>
-          <el-button type="primary" @click="changeBoss">转让 | 邀请 | 移除</el-button>
-          <el-button type="warning" @click="delTeam">删除团队</el-button>
+          <el-button type="primary" @click="changeBoss" size="mini">转让 | 邀请 | 移除</el-button>
+          <el-button type="warning" @click="delTeam" size="mini">删除团队</el-button>
           <el-divider></el-divider>
           <div class="invite">邀请码：{{ teamInfo.inv_url }}</div>
           <el-button type="primary" size="mini" @click="updateInvUrl">点击刷新</el-button>
@@ -71,6 +71,7 @@
               ></el-input>
               </el-form-item>
             <el-form-item label="打卡时间" prop="check">
+              <br />
               <el-time-select
                 style="width: 100px;"
                 placeholder="起始时间"
@@ -82,6 +83,7 @@
                   end: '22:30'
                 }">
               </el-time-select>
+              <br />
               <el-time-select
                 style="width: 100px;"
                 placeholder="结束时间"
@@ -99,7 +101,7 @@
                 class="input"
                 type="info"
                 size="medium"
-                @click="onCreateTeam('changeTeamInfo')"
+                @click="onUpdateTeam('changeTeamInfo')"
               >
                 提交修改
               </el-button>
@@ -270,7 +272,16 @@ export default {
         });
       }
     },
-    onCreateTeam(formName) {
+    // eslint-disable-next-line consistent-return
+    onUpdateTeam(formName) {
+      // eslint-disable-next-line consistent-return
+      if (this.teamInfo.leader_id !== this.userInfo.id) {
+        this.$message({
+          message: '你不是管理员！无法修改',
+          type: 'warning',
+        });
+        return false;
+      }
       // eslint-disable-next-line consistent-return
       this.$refs[formName].validate((valid) => {
         if (valid) {
@@ -350,10 +361,10 @@ export default {
             message: '踢出成功',
           });
         }
-      }).catch(() => {
+      }).catch((err) => {
         this.$message({
           type: 'warning',
-          message: '踢出失败',
+          message: err,
         });
       });
     },

@@ -60,7 +60,7 @@
 import { mapState } from 'vuex';
 import md5 from 'js-md5';
 import Storage from '../../storage/storage';
-import init from '../../init/init';
+import INIT from '../../init/init';
 
 export default {
   mounted() {
@@ -138,7 +138,7 @@ export default {
               Storage.localSet('token', res.data.data.access_token);
               Storage.localSet('username', this.ruleForm.username);
               // init
-              init();
+              INIT.INIT();
               if (this.loginNextTime) {
                 Storage.localSet('refresh_token', res.data.data.refresh_token);
               }
@@ -148,7 +148,7 @@ export default {
               });
               setTimeout(() => {
                 this.$router.push({
-                  name: 'library',
+                  name: 'member',
                 });
               }, 1000);
             }

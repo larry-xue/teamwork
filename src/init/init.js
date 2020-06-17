@@ -118,7 +118,15 @@ function init() {
       console.log(res);
       isInit = true;
       // axios.get('https://www.fastmock.site/mock/df920649f50c9cd2392aa7389a2504d3/teamwork/v1/teams').then((response) => {
-      queryTeamInfo(res.data.data.team_id);
+      if (teamInfo !== null) {
+        const queryteam = res.data.data.team_id;
+        const temp = queryteam.indexOf(teamInfo.id);
+        queryteam.splice(temp, 1);
+        queryteam.unshift(teamInfo.id);
+        queryTeamInfo(queryteam);
+      } else {
+        queryTeamInfo(res.data.data.team_id);
+      }
     }).catch((err) => {
       console.log(err.response.statusText);
       // token过期
@@ -146,4 +154,9 @@ function init() {
   }
 }
 
-export default init;
+const INIT = {
+  INIT: init,
+  TEAM_QUERY: queryTeamInfo,
+};
+
+export default INIT;

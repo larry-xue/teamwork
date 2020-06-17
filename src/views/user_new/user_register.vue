@@ -179,7 +179,7 @@ export default {
                 type: 'success',
               });
               setTimeout(() => {
-                window.location.href = '/user/login';
+                window.location.href = '/#/user/login';
               }, 1500);
             }
           }).catch((err) => {
