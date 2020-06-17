@@ -80,6 +80,9 @@
         </vue-scroll>
       </div>
     </div>
+    <div class="teamLog">
+      <teamLog></teamLog>
+    </div>
     <!-- 下达任务的表单 -->
     <el-dialog
       title="下发任务："
@@ -193,6 +196,7 @@
 <script>
 import { mapState } from 'vuex';
 import Clipboard from 'clipboard';
+import teamLog from '../../../components/teamLog.vue';
 import memberItem from '../../../components/memberItem.vue';
 
 export default {
@@ -206,6 +210,7 @@ export default {
   },
   components: {
     memberItem,
+    teamLog,
   },
   watch: {
     nowQueryId(newVal) {
@@ -556,10 +561,6 @@ export default {
     padding: 20px;
   }
 
-  .memberTodoList .headerForTodos {
-
-  }
-
   .showTodos {
     height: 80%;
   }
@@ -577,4 +578,10 @@ export default {
     margin-top: 40px;
   }
 
+  .teamLog {
+    width: 23%;
+    height: 100%;
+    float: left;
+    margin-left: 2%;
+  }
 </style>

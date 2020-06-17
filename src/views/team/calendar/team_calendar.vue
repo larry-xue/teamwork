@@ -90,7 +90,7 @@
         <el-form-item label="日程内容：" prop="desc">
           <el-input
           show-word-limit
-          maxlength="50"
+          maxlength="32"
           resize="none"
           type="textarea"
           v-model="addTodo.desc" autocomplete="off"></el-input>
