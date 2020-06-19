@@ -150,6 +150,7 @@ export default {
                 this.$router.push({
                   name: 'member',
                 });
+                window.reload();
               }, 1000);
             }
             if (meg !== '') {

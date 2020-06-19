@@ -80,7 +80,7 @@
                 :picker-options="{
                   start: '06:30',
                   step: '00:15',
-                  end: '22:30'
+                  end: '18:30'
                 }">
               </el-time-select>
               <br />
@@ -89,9 +89,9 @@
                 placeholder="结束时间"
                 v-model="changeTeamInfo.check_e"
                 :picker-options="{
-                  start: '06:00',
+                  start: '06:30',
                   step: '00:15',
-                  end: '22:30',
+                  end: '18:30',
                   minTime: changeTeamInfo.check_s
                 }">
               </el-time-select>

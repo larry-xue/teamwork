@@ -56,6 +56,8 @@
       <div class="submit">
         <h3>在这里保存嗷</h3>
         <el-button type="success" size="medium" plain @click="submit">保存</el-button>
+        <div class="nicai"></div>
+        <el-button type="primary" size="medium" plain @click="goBack">返回</el-button>
       </div>
       <el-dialog
         :visible.sync="openSubmit"
@@ -129,6 +131,11 @@ export default {
     };
   },
   methods: {
+    goBack() {
+      this.$router.push({
+        name: 'library',
+      });
+    },
     quillSubmit() {
       // this.content = html;
       this.openSubmit = true;
@@ -243,6 +250,10 @@ export default {
   }
 
   .submit h3 {
-    margin: 30px auto;
+    margin: 10px auto;
+  }
+
+    .nicai {
+    margin: 6px auto;
   }
 </style>

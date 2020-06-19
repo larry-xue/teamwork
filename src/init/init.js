@@ -66,7 +66,11 @@ function isSign(teamId) {
   });
 }
 
+// eslint-disable-next-line consistent-return
 function queryTeamInfo(teamId) {
+  if (teamId.length === 0) {
+    return false;
+  }
   axios.get(`/v1/teams/${teamId[0]}`).then((response) => {
     store.commit('updateNowTeam', response.data.data);
     // 更新本地数据

@@ -3,17 +3,30 @@
     <div class="chatList">
       <div class="searchMember">
         <el-input
-          v-model="searchMember" placeholder="搜索" @change="onSearch" clearable></el-input>
+          v-model="searchMember" placeholder="回车搜索.." @change="onSearch" clearable></el-input>
       </div>
       <vue-scroll
        slot="refresh-start"
        ref="body"
+      >
+      <div
+        v-if="searchMember === ''"
       >
       <memberItem
         v-for="item in teamInfo.members"
         :key="item.id"
         :item="item"
       ></memberItem>
+      </div>
+      <div
+        v-else
+      >
+      <memberItem
+        v-for="item in searchResult"
+        :key="item.id"
+        :item="item"
+      ></memberItem>
+      </div>
       </vue-scroll>
     </div>
     <div class="memberTodoList">
@@ -240,6 +253,7 @@ export default {
   data() {
     return {
       searchMember: '',
+      searchResult: [],
       sendTask: {
         title: '',
         desc: '',
@@ -330,19 +344,17 @@ export default {
           this.$store.commit('changeNowOpenMDText', {
             text: res.data,
           });
-          const routeUrl = this.$router.resolve({
+          this.$router.push({
             name: 'markdown',
           });
-          window.open(routeUrl.href, '_blank');
         } else {
           // word
           this.$store.commit('changeNowOpenWordText', {
             text: res.data,
           });
-          const routeUrl = this.$router.resolve({
+          this.$router.push({
             name: 'word',
           });
-          window.open(routeUrl.href, '_blank');
         }
       });
     },
@@ -442,7 +454,13 @@ export default {
       });
     },
     onSearch() {
-      console.log(this.$store.state.teamInfo);
+      this.searchResult = [];
+      for (let i = 0; i < this.teamInfo.members.length; i += 1) {
+        console.log(this.teamInfo.members[i].name.search(this.searchMember));
+        if (this.teamInfo.members[i].name.search(this.searchMember) !== -1) {
+          this.searchResult.push(this.teamInfo.members[i]);
+        }
+      }
     },
     closeSendTask() {
       this.$store.commit('changeSendtask');

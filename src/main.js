@@ -52,7 +52,7 @@ Vue.use(vuescroll, {
     scrollPanel: {
       scrollingY: true,
       scrollingX: false,
-      speed: 200,
+      speed: 10,
       easing: 'easeInOutQuart',
       verticalNativeBarPos: 'right',
       maxHeight: undefined,

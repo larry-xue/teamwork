@@ -60,7 +60,8 @@
 
 <script>
 import { mapState, mapMutations } from 'vuex';
-// import Storage from '../../storage/storage';
+import Storage from '../../storage/storage';
+import CHAT from '../../socket/socket';
 import teamNav from '../../components/nav.vue';
 
 export default {
@@ -68,6 +69,17 @@ export default {
     teamNav,
   },
   mounted() {
+    this.CHAT.init({
+      token: Storage.localGet('token'),
+      tid: this.teamInfo.id,
+    });
+  },
+  beforeDestroy() {
+    this.CHAT.leave({
+      uid: this.userInfo.id,
+      tid: this.teamInfo.id,
+      name: this.userInfo.name,
+    });
   },
   data() {
     // eslint-disable-next-line no-unused-vars
@@ -90,6 +102,7 @@ export default {
       }
     };
     return {
+      CHAT,
       createInfo: {
         name: '',
         desc: '',
@@ -137,6 +150,8 @@ export default {
   computed: {
     ...mapState({
       page: (state) => state.switchPage,
+      userInfo: (state) => state.userInfo,
+      teamInfo: (state) => state.teamInfo,
       createTeam: (state) => state.createTeam,
       isRefresh: (state) => state.isRefresh,
     }),
@@ -154,6 +169,13 @@ export default {
             this.$store.commit('addTeamToList', {
               name: res.data.data.name,
               id: res.data.data.id,
+            });
+            this.$message({
+              message: '新团队创建成功！，已添加至团队列表，可自行切换~',
+              type: 'success',
+            });
+            this.createTeamChange({
+              choose: false,
             });
           }).catch((err) => {
             console.log(err);

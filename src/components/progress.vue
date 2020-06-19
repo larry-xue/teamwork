@@ -1,11 +1,15 @@
 // 这是用于显示签到的组件
 <template>
   <div class="progress">
-    <el-progress type="circle" :percentage="hadSign" :width="250"></el-progress>
-    <div class="time">{{teamInfo.check_s}} -- {{teamInfo.check_e}}</div>
-    <div class="sign">
-      <el-button
-      size="medium" type="success" @click="signIn" circle icon="el-icon-check"></el-button>
+    <div class="progress-wrapper">
+      <el-progress type="circle" :percentage="hadSign" :width="250"></el-progress>
+      <div class="time">{{teamInfo.check_s}} -- {{teamInfo.check_e}}</div>
+    </div>
+    <div class="process-other">
+      <div class="pic" @click="signIn">
+        <!-- @click="signIn" -->
+        <span >点我签到唷~~</span>
+      </div>
     </div>
   </div>
 </template>
@@ -24,6 +28,7 @@ export default {
       if (this.presentSign === 0) {
         return 0;
       }
+      console.log(Number(((this.presentSign / this.teamInfo.members.length) * 100).toFixed(2)));
       return Number(((this.presentSign / this.teamInfo.members.length) * 100).toFixed(2));
     },
   },
@@ -64,8 +69,8 @@ export default {
                 type: 'success',
                 message: '打卡成功!',
               });
-              this.$store.commit('changeSignStatus', {
-                sign: true,
+              this.$store.commit('changePresentSign', {
+                present: this.presentSign + 1,
               });
             });
           } else {
@@ -83,18 +88,39 @@ export default {
 
 <style scoped>
   .progress {
-    max-width: 250px;
-    margin: 0 auto;
-  }
-
-  .progress .sign {
-    width: 30px;
-    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
   }
 
   .progress .time {
-    margin: 0 auto;
     padding: 14px;
     text-align: center;
+  }
+
+  .process-other {
+    padding-right: 30px;
+    align-self: flex-start;
+  }
+
+  .pic {
+    width: 20vh;
+    height: 20vh;
+    position: relative;
+    margin-top: 40%;
+    background-image: url('../assets/caomei.jpg');
+    background-size: 100%;
+    color: #aaa;
+    cursor: pointer;
+  }
+
+  .pic span {
+    position: absolute;
+    bottom: -20px;
+    -moz-user-select:none; /*火狐*/
+    -webkit-user-select:none; /*webkit浏览器*/
+    -ms-user-select:none; /*IE10*/
+    -khtml-user-select:none; /*早期浏览器*/
+    user-select:none;
   }
 </style>

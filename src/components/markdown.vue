@@ -8,6 +8,8 @@
       <div class="submit">
         <h3>在这里保存嗷</h3>
         <el-button type="success" size="medium" plain @click="submit">保存</el-button>
+        <div class="nicai"></div>
+        <el-button type="primary" size="medium" plain @click="goBack">返回</el-button>
       </div>
       <el-dialog
         :visible.sync="openSubmit"
@@ -16,7 +18,7 @@
         <el-divider></el-divider>
         <el-input maxlength="30" v-model.trim="mdName" placeholder="请输入文档名称"></el-input>
         <el-divider></el-divider>
-        <el-button type="primary" @click="localSave">保存文档</el-button>
+        <el-button style="margin-top: 20px" type="primary" @click="localSave">保存文档</el-button>
       </el-dialog>
     </div>
 </template>
@@ -51,6 +53,11 @@ export default {
     };
   },
   methods: {
+    goBack() {
+      this.$router.push({
+        name: 'library',
+      });
+    },
     // 将图片上传到服务器，返回地址替换到md中
     // eslint-disable-next-line no-unused-vars
     $imgAdd() {
@@ -144,6 +151,7 @@ export default {
         }
       }
     } else if (this.nowOpenMDText !== '') {
+      console.log(this.nowOpenMDText);
       this.content = this.nowOpenMDText;
     }
   },
@@ -163,6 +171,10 @@ export default {
   }
 
   .submit h3 {
-    margin: 30px auto;
+    margin: 10px auto;
+  }
+
+  .nicai {
+    margin: 6px auto;
   }
 </style>

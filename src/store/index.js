@@ -61,6 +61,8 @@ const store = new Vuex.Store({
     question: {},
     // 当前需要展示的问卷的结果
     nowQSForChart: {},
+    // 聊天框下拉
+    needScroll: true,
   },
   mutations: {
     changeNowTeam(state, payload) {
@@ -139,10 +141,12 @@ const store = new Vuex.Store({
       state.gotoSubmitTask = payload;
     },
     changeNowOpenMDText(state, payload) {
+      state.nowMDId = '';
       state.nowOpenMDText = payload.text;
       state.nowMDId = '';
     },
     changeNowOpenWordText(state, payload) {
+      state.nowWordId = '';
       state.nowOpenWordText = payload.text;
       state.nowWordId = '';
     },
@@ -151,6 +155,9 @@ const store = new Vuex.Store({
     },
     changeNowQSForChart(state, payload) {
       state.nowQSForChart = payload;
+    },
+    changeNeedScroll(state) {
+      state.needScroll = !state.needScroll;
     },
   },
   actions: {

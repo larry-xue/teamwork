@@ -47,7 +47,7 @@
           办公
         </el-menu-item>
         <el-menu-item index="5" @click="switchPage('/team/myself/todos')">
-          团队
+          个人
         </el-menu-item>
       </el-menu>
       </div>
@@ -95,7 +95,7 @@ export default {
         });
         setTimeout(() => {
           window.location.reload();
-        }, 1500);
+        }, 500);
       });
     },
     handleCommand(e) {

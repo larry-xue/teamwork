@@ -19,11 +19,11 @@
     <div class="user-nav">
       <el-menu
         :default-active="activeIndex" class="el-menu-demo" mode="horizontal"
-        @select="switch_user_nav">
+        >
         <el-menu-item index="1" @click="toSon(1)">
           任务
         </el-menu-item>
-        <el-menu-item  index="2">
+        <el-menu-item disabled index="2">
         日程
         </el-menu-item>
         <el-menu-item index="3" @click="toSon(3)">
@@ -103,7 +103,7 @@ export default {
 
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: flex-start;
   }
 
   .user-nav ul {

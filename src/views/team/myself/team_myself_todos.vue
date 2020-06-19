@@ -56,8 +56,6 @@
                     <i class="el-icon-time">{{ item.deadline }}</i>
                   </div>
                   <div style="float: right; padding-right: 20px;">
-                    <el-button size="mini" type="primary"
-                      @click="gotoSubmit(item)">修改任务提交</el-button>
                   </div>
                 </el-collapse-item>
               </el-collapse>

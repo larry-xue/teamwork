@@ -5,7 +5,8 @@
         <div class="onTime">
           <process></process>
         </div>
-        <div class="asd">
+        <div class="socket">
+          <socket></socket>
         </div>
       </div>
       <div class="question">
@@ -40,7 +41,16 @@
                 >查看调查结果</el-button>
                 <div class="qs-item-opt">
                   <el-button type="primary" size="mini" @click="fillQS(item)">填写问卷</el-button>
-                  <el-button type="text" size="mini" @click="deleteThisQS(item)">删除问卷</el-button>
+                  <div class="del-confirm">
+                    <el-popconfirm
+                      iconColor="red"
+                      @onConfirm="deleteThisQS(item)"
+                      title="你确定要删除这个问卷 吗 ？"
+                    >
+                    <el-button slot="reference"
+                    type="text" size="mini">删除问卷</el-button>
+                    </el-popconfirm>
+                  </div>
                 </div>
               </el-collapse-item>
             </el-collapse>
@@ -66,6 +76,7 @@
 <script>
 import { mapState } from 'vuex';
 import process from '../../../components/progress.vue';
+import socket from '../../../components/socket.vue';
 import memberRight from '../../../components/member_right.vue';
 
 export default {
@@ -89,6 +100,12 @@ export default {
   },
   methods: {
     toSeeResult(item) {
+      if (this.userInfo.id !== this.teamInfo.leader_id) {
+        this.$message({
+          message: '你不是管理员，无权查看！',
+          type: 'warning',
+        });
+      }
       this.$http.get(`/v1/questionnaires/${item.id}/records`).then((res) => {
         this.$http.get(`/v1/questionnaires/${item.id}`).then((response) => {
           const info = {};
@@ -182,6 +199,7 @@ export default {
   components: {
     memberRight,
     process,
+    socket,
   },
 };
 </script>
@@ -204,10 +222,10 @@ export default {
 
   .member-wrapper-some {
     float: left;
-    width: 40%;
+    width: 48%;
     height: 90%;
     margin-top: 2%;
-    margin-left: 5%;
+    margin-left: 1%;
   }
 
   .question {
@@ -245,5 +263,15 @@ export default {
     margin-top: 30px;
     display: flex;
     flex-direction: column;
+  }
+
+  .del-confirm {
+    display: flex;
+    justify-content: center;
+  }
+
+  .socket {
+    width: 100%;
+    height: 40%;
   }
 </style>

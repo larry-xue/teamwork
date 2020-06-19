@@ -84,33 +84,49 @@
 
       <div class="worksheetFile">
         <!-- 展示文件 -->
+      <vue-scroll
+        slot="refresh-start"
+        ref="body"
+      >
         <el-card shadow="hover">
-          <h4 slot="header">markdown</h4>
           <div class="file-item"
-            v-for="(item, index) in wordFiles"
+            v-for="(item, index) in showFiles.archives"
             :key="index"
           >
-            {{item.name}}
+          <div class="file-name">
+            <p>{{ item.name }}</p>
+            <div>
+              <div class="confirmDel">
+                <el-popconfirm
+                  confirmButtonText='确认'
+                  cancelButtonText='取消'
+                  icon="el-icon-delete"
+                  iconColor="red"
+                  @onConfirm="delFile(item.archive_url)"
+                  title="确定删除该文件？"
+                >
+                  <i slot="reference" class="el-icon-delete"></i>
+                </el-popconfirm>
+              </div>
+              <i :class="item.type === 3 ? 'el-icon-download' : 'el-icon-tickets'"
+              @click="fileOptions(item)"></i>
+            </div>
+          </div>
+          <div class="file-time">
+            {{ item.datetime }}
+          </div>
           </div>
         </el-card>
-        <el-card shadow="hover" style="margin-top: 20px;">
-          <h4 slot="header">富文本</h4>
-          <div class="file-item"
-            v-for="(item, index) in mdFiles"
-            :key="index"
-          >
-            {{item.name}}
-          </div>
-        </el-card>
-        <el-card shadow="hover" style="margin-top: 20px;">
-          <h4 slot="header">其他文件</h4>
-          <div class="file-item"
-            v-for="(item, index) in otherFiles"
-            :key="index"
-          >
-            {{item.name}}
-          </div>
-        </el-card>
+      </vue-scroll>
+      <div class="file-page">
+        <el-pagination
+
+          layout="prev, pager, next"
+          :current-page.sync="currentFilePage"
+          @current-change="showTeamFile"
+          :page-count="totalPage">
+        </el-pagination>
+      </div>
       </div>
     </div>
     <el-dialog title="提交任务文件"
@@ -192,6 +208,7 @@ export default {
     ...mapState({
       nowMdId: (state) => state.nowMdId,
       nowWordId: (state) => state.nowWordId,
+      userInfo: (state) => state.userInfo,
       mdList: (state) => state.mdList,
       wordList: (state) => state.wordList,
       teamInfo: (state) => state.teamInfo,
@@ -200,10 +217,10 @@ export default {
   },
   data() {
     return {
+      currentFilePage: 1,
+      totalPage: 0,
+      showFiles: [],
       fileList: [],
-      mdFiles: [],
-      wordFiles: [],
-      otherFiles: [],
       dialogVisible: false,
       uploadFile: {
         text: '',
@@ -233,6 +250,73 @@ export default {
     };
   },
   methods: {
+    delFile(url) {
+      if (this.teamInfo.leader_id !== this.userInfo.id) {
+        this.$message({
+          message: '你不是管理员，无权删除文件',
+        });
+      } else {
+        const fileName = url.split('/').pop();
+        this.$http.delete(`/v1/archives/${fileName}`).then(() => {
+          this.$message({
+            message: '删除成功！',
+            type: 'success',
+          });
+        }).catch((err) => {
+          this.$message({
+            message: err,
+            type: 'warning',
+          });
+        });
+      }
+    },
+    fileOptions(item) {
+      if (item.type === 3) {
+        window.open(item.archive_url);
+      } else {
+        // 先请求
+        const fileName = item.archive_url.split('/').pop();
+        this.$http.get(`/v1/archives/${fileName}`).then((res) => {
+          if (item.type === 1) {
+            this.$store.commit('changeNowOpenMDText', {
+              text: res.data,
+            });
+            this.$router.push({
+              name: 'markdown',
+            });
+          } else {
+          // word
+            this.$store.commit('changeNowOpenWordText', {
+              text: res.data,
+            });
+            this.$router.push({
+              name: 'word',
+            });
+          }
+        });
+      }
+    },
+    // showFiles
+    showTeamFile(Qpage) {
+      console.log(Qpage);
+      this.$http.get(`/v1/teams/${this.teamInfo.id}/archives`, {
+        params: {
+          page: Qpage,
+        },
+      }).then((res) => {
+        console.log(res.data.data);
+        const temp = res.data.data;
+        for (let i = 0; i < temp.archives.length; i += 1) {
+          const t = temp.archives[i].datetime.split('T');
+          temp.archives[i].datetime = `${t[0]} ${t[1]}`;
+        }
+        this.showFiles = temp;
+        this.totalPage = temp.pages;
+        console.log(temp.pages);
+        this.currentFilePage = Qpage;
+        console.log(temp);
+      });
+    },
     // 删除本地文档
     deleteThisDoc(item, name) {
       let docList;
@@ -407,6 +491,7 @@ export default {
     if (JSON.stringify(this.gotoSubmitTask) !== JSON.stringify({})) {
       this.uploadFile.finish = this.gotoSubmitTask.finish;
     }
+    this.showTeamFile(1);
   },
 };
 </script>
@@ -487,5 +572,43 @@ export default {
 
   .doc-edit-item:hover {
     background-color: #ddd;
+  }
+
+  .file-name {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+    transition: .3 linear all;
+  }
+
+  .file-name:hover {
+    background-color: #eee;
+  }
+
+  .file-name i {
+    cursor: pointer;
+  }
+
+  .file-time {
+    color: #bbb;
+    font-size: 12px;
+  }
+
+  .worksheet .worksheetFile {
+    height: 55vh;
+    position: relative;
+  }
+
+  .file-page {
+    display: flex;
+    width: 100%;
+    justify-content: center;
+    position: absolute;
+    bottom: -20px;
+  }
+
+  .confirmDel {
+    padding-left: 20px;
+    float: right;
   }
 </style>

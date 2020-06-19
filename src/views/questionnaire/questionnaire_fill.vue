@@ -100,8 +100,21 @@ export default {
       }
       this.$http.post(`/v1/questionnaires/${this.question.id}`, {
         answers: send,
-      }).then((res) => {
-        console.log(res);
+      }).then(() => {
+        this.$message({
+          message: '问卷提交成功！',
+          type: 'success',
+        });
+      }).catch((err) => {
+        if (err.response.status === 403) {
+          this.$message({
+            message: '你已经提交过问卷了！',
+          });
+        } else {
+          this.$message({
+            message: err,
+          });
+        }
       });
     },
   },

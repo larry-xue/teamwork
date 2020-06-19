@@ -155,7 +155,7 @@ export default {
       console.log(file);
       if (file !== undefined) {
       // 上传图片
-        param.append('file', file);
+        param.append('avatar', file);
         this.$http.put('/v1/users/avatar', param, {
           headers: {
             'Content-Type': 'multipart/form-data',
@@ -255,6 +255,10 @@ export default {
           if (res.data.code === 0) {
             this.$store.commit('updateUserInfo', res.data.data);
           }
+          this.$message({
+            message: '信息更新成功！',
+            type: 'success',
+          });
         }).catch(() => {
           this.$message({
             type: 'warning',

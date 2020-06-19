@@ -42,6 +42,8 @@
                     <el-input
                         size="mini"
                         clearable
+                        type="textarea"
+                        resize="none"
                         v-model.trim="sendQuestion.desc" maxlength="128" show-word-limit></el-input>
                   </div>
                   <div  style="margin: 10px 0;" class="info-deadline">
@@ -272,6 +274,11 @@ export default {
             message: '问卷创建成功!',
             type: 'success',
           });
+          setTimeout(() => {
+            this.$router.push({
+              name: 'member',
+            });
+          }, 1000);
         }).catch((err) => {
           console.log(err);
           this.$message({

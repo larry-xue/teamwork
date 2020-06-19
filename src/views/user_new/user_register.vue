@@ -60,13 +60,14 @@
           </el-divider>
           <div class="otherMethod">
             <div>
-              <el-link
-                href="/#/user/login"
+              <span
+                class="toLogin"
+                @click="toLogin"
                 type="success"
                 icon="el-icon-s-promotion"
               >
                 点此登录
-              </el-link>
+              </span>
             </div>
           </div>
         </el-form>
@@ -155,6 +156,11 @@ export default {
     }),
   },
   methods: {
+    toLogin() {
+      this.$router.push({
+        name: 'login',
+      });
+    },
     submitForm(formName) {
       this.$refs[formName].validate((valid) => {
         let val = true;
@@ -254,5 +260,14 @@ export default {
   .otherMethod {
     display: flex;
     justify-content: space-around;
+  }
+
+  .toLogin {
+    font-size: 13px;
+    cursor: pointer;
+  }
+
+  .toLogin:hover {
+    text-decoration: underline;
   }
 </style>
