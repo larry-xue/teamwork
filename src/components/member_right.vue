@@ -50,7 +50,19 @@
         <el-collapse-item title="团队管理">
           <el-divider></el-divider>
           <el-button type="primary" @click="changeBoss" size="mini">转让 | 邀请 | 移除</el-button>
-          <el-button type="warning" @click="delTeam" size="mini">删除团队</el-button>
+          <div style="margin-top:10px">
+            <el-popconfirm
+              confirmButtonText='确认'
+              cancelButtonText='取消'
+              icon="el-icon-info"
+              iconColor="red"
+              @onConfirm="delTeam"
+              title="确定解散团队吗？"
+            >
+              <el-button type="warning" slot="reference"
+              size="mini">删除团队</el-button>
+            </el-popconfirm>
+          </div>
           <el-divider></el-divider>
           <div class="invite">邀请码：{{ teamInfo.inv_url }}</div>
           <el-button type="primary" size="mini" @click="updateInvUrl">点击刷新</el-button>
@@ -370,9 +382,9 @@ export default {
     },
     // eslint-disable-next-line consistent-return
     changeBoss() {
-      this.seeTeamAction = true;
       if (this.$store.state.userInfo.id === this.$store.state.teamInfo.leader_id) {
         // 打开列表
+        this.seeTeamAction = true;
       } else {
         this.$message({
           message: '你不是管理员，无法操作',

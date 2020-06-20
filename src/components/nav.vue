@@ -24,6 +24,9 @@
             >
               创建新团队
             </el-dropdown-item>
+            <el-dropdown-item command='joinTeam'>
+              加入团队
+            </el-dropdown-item>
             <el-dropdown-item command='logout'>
               退出登录
             </el-dropdown-item>
@@ -70,6 +73,7 @@ export default {
   data() {
     return {
       activeIndex: '1',
+      showJoin: false,
     };
   },
   methods: {
@@ -120,6 +124,25 @@ export default {
           this.$message({
             type: 'info',
             message: '已取消登出',
+          });
+        });
+      } else if (e === 'joinTeam') {
+        this.showJoin = true;
+        this.$prompt('请输入邀请码', '加入团队', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+        }).then(({ value }) => {
+          this.$http.get('/v1/teams/join', {
+            params: {
+              inv: value,
+            },
+          }).then(() => {
+            this.$message({
+              type: 'success',
+              message: '加入团队成功！可在团队列表中切换团队！',
+            });
+          }).catch((err) => {
+            console.log(err);
           });
         });
       }

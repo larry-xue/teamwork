@@ -77,7 +77,6 @@
                 v-for="item in userTodosDone"
                 :key="item.id"
                 shadow="hover">
-                <!-- http://47.107.32.138/archives/61bca6a7d5404211acfb2d4de067b78c.xls -->
                 <div class="todo-item">
                   <h5>{{ item.title }}</h5>
                   <p>{{ item.desc }}</p>
@@ -135,7 +134,16 @@
     >
       <div class="cover-opt" style="margin-top: 20px;">
         <h3 style="float: left; margin-top: -10px;">编辑任务：</h3>
-        <el-button type="warning" @click="delTask">删除任务</el-button>
+        <el-popconfirm
+          confirmButtonText='确认'
+          cancelButtonText='取消'
+          icon="el-icon-warning"
+          iconColor="red"
+          @onConfirm="delTask"
+          title="确定删除该任务？"
+        >
+        <el-button type="warning" slot="reference">删除任务</el-button>
+        </el-popconfirm>
       </div>
       <!-- 编辑任务 -->
       <div class="edittask">
@@ -187,6 +195,18 @@
               icon="el-icon-document-copy" type="primary">
               {{ item.name }}
             </el-link>
+            <div class="delBtn">
+              <el-popconfirm
+                confirmButtonText='确认'
+                cancelButtonText='取消'
+                icon="el-icon-warning"
+                iconColor="red"
+                @onConfirm="delThisFile(item)"
+                title="确定删除该文件？"
+              >
+                <i slot="reference" class="el-icon-delete"></i>
+              </el-popconfirm>
+            </div>
             <span
               v-if="item.type == 3"
               style="float: right; cursor: pointer; color: #bbb"
@@ -332,6 +352,28 @@ export default {
     }),
   },
   methods: {
+    delThisFile(item) {
+      // eslint-disable-next-line max-len
+      if (this.userInfo === this.teamInfo.leader_id || this.userInfo.id === this.nowEditUser.assignee) {
+        const fileName = item.archive_url.split('/').pop();
+        this.$http.delete(`/v1/archives/${fileName}`).then(() => {
+          this.$message({
+            message: '删除成功！',
+            type: 'success',
+          });
+        }).catch((err) => {
+          this.$message({
+            message: err,
+            type: 'warning',
+          });
+        });
+      } else {
+        this.$message({
+          message: '不要偷偷删除别人的文件唷~~',
+          type: 'warning',
+        });
+      }
+    },
     // 文档预览
     previewDoc(item) {
       console.log(item);
@@ -389,7 +431,15 @@ export default {
       console.log(send);
       this.queryTasks(send);
     },
+    // eslint-disable-next-line consistent-return
     editTask(formName) {
+      if (this.userInfo.id !== this.teamInfo.leader_id) {
+        this.$message({
+          message: '你不是管理员，无权修改任务',
+          type: 'warning',
+        });
+        return false;
+      }
       this.$refs[formName].validate((valid) => {
         if (valid) {
           // 提交修改
@@ -411,8 +461,15 @@ export default {
         }
       });
     },
+    // eslint-disable-next-line consistent-return
     delTask() {
-      console.log(this.nowEditUser);
+      if (this.userInfo.id !== this.teamInfo.leader_id) {
+        this.$message({
+          message: '你不是管理员，无权删除任务',
+          type: 'warning',
+        });
+        return false;
+      }
       this.$http.delete(`/v1/tasks/${this.nowEditUser.id}`).then(() => {
         this.$message({
           message: '任务删除成功！',
@@ -601,5 +658,11 @@ export default {
     height: 100%;
     float: left;
     margin-left: 2%;
+  }
+
+  .delBtn {
+    display: inline-block;
+    cursor: pointer;
+    padding-left: 10px;
   }
 </style>

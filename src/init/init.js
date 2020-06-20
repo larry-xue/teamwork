@@ -132,7 +132,6 @@ function init() {
         queryTeamInfo(res.data.data.team_id);
       }
     }).catch((err) => {
-      console.log(err.response.statusText);
       // token过期
       if (err.response.statusText === 'FORBIDDEN') {
         // token过期
